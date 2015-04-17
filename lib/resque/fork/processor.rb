@@ -15,19 +15,19 @@ module Resque
       end
 
       def start
-        elect_master
+        start_internal
       end
 
       private
 
-      def elect_master
-        @redis.watch(@batch_indexing_queue) do
-          if @redis.exists(@batch_indexing_queue)
-            @redis.unwatch
+      def start_internal
+        @config.redis.watch(@config.batch_indexing_queue) do
+          if @config.redis.exists(@config.batch_indexing_queue)
+            @config.redis.unwatch
             Resque::Fork::Worker.configure(@config)
             # slave_job()
           else
-            @redis.multi do |multi|
+            @config.redis.multi do |multi|
               Resque::Fork::Master.orchestrate(@config)
             end
           end
