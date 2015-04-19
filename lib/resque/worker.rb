@@ -62,7 +62,7 @@ require 'resque'
       unregister_worker(exception)
     end
   end
-end
+end if defined?(::Resque::Worker)
 
 ::Resque.class_eval do
   # The `after_timeout` hook will be run in the **parent** process
@@ -87,4 +87,4 @@ end
   def after_timeout=(block)
     register_hook(:after_timeout, block)
   end
-end
+end if defined?(::Resque)
