@@ -1,6 +1,6 @@
 # Resque::Fork
 
-In effort to use redis to perform distributed indexing through ElasticSearch just like
+An effort to use redis to perform distributed indexing for ElasticSearch just like
 [wonderdog](https://github.com/infochimps-labs/wonderdog)
 
 No direct dependancy on gem like `tire` yet !
