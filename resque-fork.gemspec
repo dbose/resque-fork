@@ -22,13 +22,15 @@ Gem::Specification.new do |spec|
     raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
   end
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.files         = Dir["README.md","Gemfile","Rakefile", "spec/*", "lib/**/*"]
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  s.add_dependency    "redis-namespace", "~> 1.3"
-  spec.add_dependency "resque", "1.25.2"
+  spec.add_dependency   "redis-namespace", "~> 1.3"
+  spec.add_dependency   "resque", "1.25.2"
+  spec.add_dependency   "resque-pause"
+  spec.add_dependency   "pry"
 
   spec.add_development_dependency "bundler", "~> 1.9"
   spec.add_development_dependency "rake", "~> 10.0"

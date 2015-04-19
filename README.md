@@ -1,8 +1,9 @@
 # Resque::Fork
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/resque/fork`. To experiment with that code, run `bin/console` for an interactive prompt.
+In effort to use redis to perform distributed indexing through ElasticSearch just like
+[wonderdog](https://github.com/infochimps-labs/wonderdog)
 
-TODO: Delete this and the text above, and describe your gem
+No direct dependancy on gem like `tire` yet !
 
 ## Installation
 

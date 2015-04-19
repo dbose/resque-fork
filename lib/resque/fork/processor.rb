@@ -8,10 +8,15 @@ module Resque
     # redis-resque
     #
     class Processor
+      attr_accessor :resource_name
 
       # @param [Resque::Fork::Config] config
+      # @param [String] resource name
       def initialize(config)
         @config  = config
+
+        # Ensure Resque uses our namespaced redis connection
+        Resque.redis = @config.redis        
       end
 
       def start
@@ -25,13 +30,18 @@ module Resque
           if @config.redis.exists(@config.batch_indexing_queue)
             @config.redis.unwatch
             Resque::Fork::Worker.configure(@config)
-            # slave_job()
           else
             @config.redis.multi do |multi|
-              Resque::Fork::Master.orchestrate(@config)
+              #
+              # Pause the RT queue
+              Resque::Fork::Master.pause_realtime_queue(@config)
+
+              # Distribute the job
+              Resque::Fork::Master.distribute(@config)
             end
           end
         end
+        ::Resque::Fork::Worker.start_processing(@config)
       end
 
     end
