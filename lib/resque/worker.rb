@@ -1,7 +1,6 @@
 #
 # Extended to track timeout events in a worker loop
 
-require 'resque'
 
 ::Resque::Worker.class_eval do
   def work(interval = 5.0, &block)

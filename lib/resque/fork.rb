@@ -5,7 +5,6 @@ require 'redis-namespace'
 
 require 'resque'
 require 'resque-pause'
-require File.expand_path(File.join('worker'), File.dirname(__FILE__))
 
 require "resque/fork/config"
 require "resque/fork/processor"

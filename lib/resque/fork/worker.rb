@@ -141,6 +141,8 @@ module Resque
       def self.perform(resource_name, from, to)
         hook = ::Resque::Fork.hooks[:on_action]
         hook.call(resource_name, from, to) unless hook.nil?
+
+        # In case of crash ensure quing back
       end
 
     end
