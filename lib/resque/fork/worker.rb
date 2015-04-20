@@ -134,7 +134,7 @@ module Resque
       # QUEUE=foo rake resque:worker
       #
       def self.start_processing(config)
-        @worker = Resque::Worker.new(config.batch_indexing_queue)
+        @worker = ::Resque::Worker.new(config.batch_indexing_queue)
         @worker.work()
       end
 
