@@ -21,9 +21,9 @@ module Resque
           #                     Marshal.dump([p, (i+1) * NO_OF_BUCKET])
 
           # Probably we need a resource.class.name (Business, Region etc.)
-          Resque.enqueue_to(@config.batch_indexing_queue, 
+          Resque.enqueue_to(@config.batch_indexing_queue,
                             ::Resque::Fork::Worker,
-                            @config.resource_name, 
+                            @config.resource_name,
                             p,                     
                             (i+1) * @config.number_of_bucket.to_i)
         end

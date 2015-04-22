@@ -4,6 +4,7 @@ require 'redis'
 require 'redis-namespace'
 
 require 'resque'
+require_relative '../../lib/resque/worker'
 require 'resque-pause'
 
 require "resque/fork/config"
@@ -34,7 +35,7 @@ module Resque
     #
     # Start distributed processing/indexing
     def self.start(options = {})
-      processor = Resque::Fork::Processor.new(Resque::Fork::Config.new(options))
+      processor = Resque::Fork::Processor.new(self.config)
       processor.start
     end
 

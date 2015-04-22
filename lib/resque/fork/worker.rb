@@ -6,6 +6,10 @@ module Resque
 
     class Worker
 
+      def self.config
+        @config ||= Resque::Fork.config
+      end
+
       #
       # Configures the worker
       # @param [Resque::Fork::Config] config
@@ -14,7 +18,10 @@ module Resque
         @config = config
 
         Resque.after_timeout do |worker|
-          on_completion(worker)
+          @worker = worker
+
+          # on_completion(worker)
+          self.shutdown
         end
 
         #
@@ -45,7 +52,7 @@ module Resque
       end
 
       def self.queue_key
-        "queue:#{@config.batch_indexing_queue}"
+        "queue:#{config.batch_indexing_queue}"
       end
 
       #
@@ -71,22 +78,18 @@ module Resque
         # Check (in a race-free manner) whether we are the last worker to be exited.
         # In that case we need to ensure about un-pausing the real-time queue
         #
-        @config.redis.watch(self.queue_key) do
+        config.redis.watch(self.queue_key) do
 
           # If we are the last one
-          if @config.redis.llen(self.queue_key) != 1
-            @config.redis.unwatch
+          if config.redis.llen(self.queue_key) != 1
+            config.redis.unwatch
           else
-            @config.redis.multi do
+            config.redis.multi do
               self.on_resume_realtime_queue()
             end
           end
 
-          # graceful shutdown
-          worker.shutdown
-
-          # kill the process
-          exit 0
+          self.shutdown
         end
 
         #@config.redis.multi do
@@ -95,6 +98,14 @@ module Resque
         #end
         #
         #exit 0
+      end
+
+      def self.shutdown
+        puts "Job done. Shuting down workers...#{@worker.pid}"
+
+        # graceful shutdown
+        @worker.shutdown!
+        #Process.kill("QUIT", @worker.pid)
       end
 
       #
@@ -120,8 +131,8 @@ module Resque
           #
           # "resque:Polaris:queue:high"
           #
-          ::Resque::Fork.with_pristine_redis(@config) do
-            @config.realtime_queues.each do |queue|
+          ::Resque::Fork.with_pristine_redis(config) do
+            config.realtime_queues.each do |queue|
               ::ResquePauseHelper.unpause(queue)
             end
           end
@@ -141,9 +152,19 @@ module Resque
       def self.perform(resource_name, from, to)
         hook = ::Resque::Fork.hooks[:on_action]
         hook.call(resource_name, from, to) unless hook.nil?
-
-        # In case of crash ensure quing back
       end
+
+      #def self.after_perform_check_for_empty(resource_name, from, to)
+      #  self.on_exhausted do
+      #    self.shutdown rescue nil
+      #  end
+      #end
+      #
+      #def self.on_exhausted(&block)
+      #  config.redis.watch(self.queue_key) do
+      #    yield if config.redis.llen(self.queue_key).zero?
+      #  end
+      #end
 
     end
 
